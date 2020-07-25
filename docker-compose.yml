@@ -1,0 +1,72 @@
+version: '3.2'
+
+services:
+  murmur:
+    image: vimagick/murmur
+    ports:
+      - "64738:64738/tcp"
+      - "64738:64738/udp"
+    volumes:
+      - type: bind
+        source: ./etc-murmur/murmur.sqlite
+        target: /etc/murmur/murmur.sqlite
+    restart: always
+    networks:
+      - backend
+
+  icecast:
+    env_file: .env
+    build:
+      context: ./icecast/
+#    image: vitiman/alpine-icecast:latest
+    ports:
+      - "8000:8000"
+    restart: always
+    networks:
+      - backend
+
+  liquidsoap:
+    env_file: .env
+    build:
+      context: ./liquidsoap/
+#    image: liquidsoap:latest
+    devices:
+      - /dev/snd
+#      - /dev/snd/controlC0
+#      - /dev/snd/pcmC0D0c
+#      - /dev/snd/pcmC0D0p
+#      - /dev/snd/pcmC0D1c
+#      - /dev/snd/pcmC0D1p
+#      - /dev/snd/seq
+#      - /dev/snd/timer
+    volumes:
+      - type: bind
+        source: ./liquidsoap/stream.liq
+        target: /etc/liquidsoap/stream.liq
+    restart: always
+    networks:
+      - backend
+
+  pymumble:
+    build:
+      context: ./pymumble/
+#    links: 
+#      - "murmur:mumbleserver"
+    devices:
+      - /dev/snd
+#      - /dev/snd/controlC0
+#      - /dev/snd/pcmC0D0c
+#      - /dev/snd/pcmC0D0p
+#      - /dev/snd/pcmC0D1c
+#      - /dev/snd/pcmC0D1p
+#      - /dev/snd/seq
+#      - /dev/snd/timer
+    depends_on:
+      - murmur
+    restart: always
+    networks:
+      - backend
+
+networks:
+  backend:
+
