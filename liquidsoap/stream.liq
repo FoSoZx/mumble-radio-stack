@@ -9,6 +9,6 @@ output.icecast(
 	port=8000,
 	password=getenv("ICECAST_PASSWORD"),
 	fallible=true,
-	mount="/relay.opus",
+	mount="/stream.opus",
 	mean(source)
 )
